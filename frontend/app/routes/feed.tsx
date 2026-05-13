@@ -718,11 +718,6 @@ const FeedPage: React.FC = () => {
   const showTeamNewsTabs = isCoach || isAdmin;
   const onTeamTab = showTeamNewsTabs && coachTab === 'team';
 
-  const noteFeedItems = useMemo(
-    () => (feedForYou || []).filter((i) => i.type === 'personal_note'),
-    [feedForYou]
-  );
-
   const items = onTeamTab ? [] : feedForYou;
 
   const positionSortKey = (pos: string | undefined) => {
@@ -897,21 +892,6 @@ const FeedPage: React.FC = () => {
                     ))}
                   </div>
                 )}
-                {noteFeedItems.length > 0 ? (
-                  <>
-                    <h2 className="adminTeamSectionTitle" style={{ marginTop: '1.5rem' }}>
-                      Notes for you
-                    </h2>
-                    <hr className="adminTeamSectionDivider" />
-                    {noteFeedItems.map((item) => (
-                      <FeedCard
-                        key={item.id}
-                        item={item}
-                        onOpenRecipientNote={(d) => setRecipientNoteDialog(d)}
-                      />
-                    ))}
-                  </>
-                ) : null}
               </>
             ) : isAdmin && coachTab === 'team' ? (
               <>
@@ -1001,21 +981,6 @@ const FeedPage: React.FC = () => {
                     ))}
                   </div>
                 )}
-                {noteFeedItems.length > 0 ? (
-                  <>
-                    <h2 className="adminTeamSectionTitle" style={{ marginTop: '1.5rem' }}>
-                      Notes for you
-                    </h2>
-                    <hr className="adminTeamSectionDivider" />
-                    {noteFeedItems.map((item) => (
-                      <FeedCard
-                        key={item.id}
-                        item={item}
-                        onOpenRecipientNote={(d) => setRecipientNoteDialog(d)}
-                      />
-                    ))}
-                  </>
-                ) : null}
               </>
             ) : (
               <>
