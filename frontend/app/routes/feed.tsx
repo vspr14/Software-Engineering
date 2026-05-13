@@ -335,7 +335,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
   } catch {
     feedForYou = [];
   }
-  if (userId && (isCoach || isPlayer || isAdmin)) {
+  // Always merge notes for any signed-in userId. Backend only returns notes for this viewer
+  // (coach inbox, linked player thread, etc.). Do not gate on Cognito groups: roster-linked
+  // accounts may not have `player` / `players` in groups but still see notes on /profile.
+  if (userId) {
     try {
       const nr = await fetch(
         `${backendBaseUrl}/api/notes/feed-for-viewer?viewerId=${encodeURIComponent(userId)}`
@@ -715,6 +718,11 @@ const FeedPage: React.FC = () => {
   const showTeamNewsTabs = isCoach || isAdmin;
   const onTeamTab = showTeamNewsTabs && coachTab === 'team';
 
+  const noteFeedItems = useMemo(
+    () => (feedForYou || []).filter((i) => i.type === 'personal_note'),
+    [feedForYou]
+  );
+
   const items = onTeamTab ? [] : feedForYou;
 
   const positionSortKey = (pos: string | undefined) => {
@@ -889,6 +897,21 @@ const FeedPage: React.FC = () => {
                     ))}
                   </div>
                 )}
+                {noteFeedItems.length > 0 ? (
+                  <>
+                    <h2 className="adminTeamSectionTitle" style={{ marginTop: '1.5rem' }}>
+                      Notes for you
+                    </h2>
+                    <hr className="adminTeamSectionDivider" />
+                    {noteFeedItems.map((item) => (
+                      <FeedCard
+                        key={item.id}
+                        item={item}
+                        onOpenRecipientNote={(d) => setRecipientNoteDialog(d)}
+                      />
+                    ))}
+                  </>
+                ) : null}
               </>
             ) : isAdmin && coachTab === 'team' ? (
               <>
@@ -978,6 +1001,21 @@ const FeedPage: React.FC = () => {
                     ))}
                   </div>
                 )}
+                {noteFeedItems.length > 0 ? (
+                  <>
+                    <h2 className="adminTeamSectionTitle" style={{ marginTop: '1.5rem' }}>
+                      Notes for you
+                    </h2>
+                    <hr className="adminTeamSectionDivider" />
+                    {noteFeedItems.map((item) => (
+                      <FeedCard
+                        key={item.id}
+                        item={item}
+                        onOpenRecipientNote={(d) => setRecipientNoteDialog(d)}
+                      />
+                    ))}
+                  </>
+                ) : null}
               </>
             ) : (
               <>
